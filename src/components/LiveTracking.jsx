@@ -29,7 +29,7 @@ const LiveTracking = ({ routeGeoJSON: propRouteGeoJSON, distance, duration }) =>
 
     // Polyline decoder function (for encoded polylines from Ola API)
     const decodePolyline = (encoded) => {
-        console.log('Decoding polyline:', encoded.substring(0, 50) + '...');
+        // console.log('Decoding polyline:', encoded.substring(0, 50) + '...');
         let index = 0,
             lat = 0,
             lng = 0;
@@ -64,7 +64,7 @@ const LiveTracking = ({ routeGeoJSON: propRouteGeoJSON, distance, duration }) =>
 
                 coordinates.push([lng * 1e-5, lat * 1e-5]);
             }
-            console.log('Decoded coordinates length:', coordinates.length);
+            // console.log('Decoded coordinates length:', coordinates.length);
             return coordinates;
         } catch (error) {
             console.error('Polyline decoding failed:', error);
@@ -78,9 +78,9 @@ const LiveTracking = ({ routeGeoJSON: propRouteGeoJSON, distance, duration }) =>
     }, [propRouteGeoJSON]);
 
     useEffect(() => {
-        console.log('Initializing map...');
+        // console.log('Initializing map...');
         if (map.current) {
-            console.log('Map already exists, skipping init.');
+            // console.log('Map already exists, skipping init.');
             return;
         }
 
@@ -91,12 +91,12 @@ const LiveTracking = ({ routeGeoJSON: propRouteGeoJSON, distance, duration }) =>
                 center: [currentPosition.lng, currentPosition.lat],
                 zoom: 15,
                 transformRequest: (url, resourceType) => {
-                    console.log("MapLibre requesting:", { url, resourceType });
+                    // console.log("MapLibre requesting:", { url, resourceType });
                     if (url.includes('olamaps.io')) {
                         try {
                             const modifiedUrl = new URL(url);
                             modifiedUrl.searchParams.set('api_key', OLA_MAPS_API_KEY);
-                            console.log('Modified URL:', modifiedUrl.toString());
+                            // console.log('Modified URL:', modifiedUrl.toString());
                             return { url: modifiedUrl.toString() };
                         } catch (error) {
                             console.error("Error modifying URL:", error);
@@ -121,14 +121,14 @@ const LiveTracking = ({ routeGeoJSON: propRouteGeoJSON, distance, duration }) =>
 
         return () => {
             if (map.current) {
-                console.log('Removing map on cleanup.');
+                // console.log('Removing map on cleanup.');
                 map.current.remove();
             }
         };
     }, []);
 
     useEffect(() => {
-        console.log('Updating current position:', currentPosition);
+        // console.log('Updating current position:', currentPosition);
         if (marker.current) {
             try {
                 marker.current.setLngLat([currentPosition.lng, currentPosition.lat]);
@@ -193,7 +193,7 @@ const LiveTracking = ({ routeGeoJSON: propRouteGeoJSON, distance, duration }) =>
                 marker.current.setLngLat(newLngLat);
                 if (isInitialLoad || !routeGeoJSON) {
                     map.current.setCenter(newLngLat);
-                    console.log('Map centered on user position (initial or no route).');
+                    // console.log('Map centered on user position (initial or no route).');
                     setIsInitialLoad(false);
                 } else {
                     console.log('Map not centered, allowing manual interaction.');
@@ -205,7 +205,7 @@ const LiveTracking = ({ routeGeoJSON: propRouteGeoJSON, distance, duration }) =>
     };
 
     useEffect(() => {
-        console.log('RouteGeoJSON changed:', routeGeoJSON, 'Distance:', distance, 'Duration:', duration);
+        // console.log('RouteGeoJSON changed:', routeGeoJSON, 'Distance:', distance, 'Duration:', duration);
         if (!map.current) {
             console.log('Map not ready yet, skipping route update.');
             return;
@@ -266,7 +266,7 @@ const LiveTracking = ({ routeGeoJSON: propRouteGeoJSON, distance, duration }) =>
             let coordinates;
 
             if (typeof routeGeoJSON === 'string') {
-                console.log('Handling as encoded polyline string.');
+                // console.log('Handling as encoded polyline string.');
                 try {
                     coordinates = decodePolyline(routeGeoJSON);
                     if (coordinates.length < 2) {
@@ -278,14 +278,14 @@ const LiveTracking = ({ routeGeoJSON: propRouteGeoJSON, distance, duration }) =>
                     return;
                 }
             } else if (Array.isArray(routeGeoJSON)) {
-                console.log('Handling as coordinate array.');
+                // console.log('Handling as coordinate array.');
                 coordinates = routeGeoJSON;
                 if (coordinates.length < 2) {
                     console.warn('Coordinate array too short:', coordinates.length);
                     return;
                 }
             } else if (routeGeoJSON.type && (routeGeoJSON.type === 'Feature' || routeGeoJSON.type === 'FeatureCollection' || routeGeoJSON.type === 'LineString')) {
-                console.log('Handling as GeoJSON:', routeGeoJSON.type);
+                // console.log('Handling as GeoJSON:', routeGeoJSON.type);
                 if (routeGeoJSON.type === 'LineString') {
                     geojson = { type: 'Feature', geometry: routeGeoJSON, properties: {} };
                 } else if (routeGeoJSON.type === 'Feature') {
@@ -314,7 +314,7 @@ const LiveTracking = ({ routeGeoJSON: propRouteGeoJSON, distance, duration }) =>
                     geometry: { type: 'LineString', coordinates },
                     properties: {}
                 };
-                console.log('Created GeoJSON with coordinates length:', coordinates.length);
+                // console.log('Created GeoJSON with coordinates length:', coordinates.length);
             } else if (!geojson) {
                 console.error('No valid coordinates found');
                 return;
@@ -353,7 +353,7 @@ const LiveTracking = ({ routeGeoJSON: propRouteGeoJSON, distance, duration }) =>
             if (coords && coords.length >= 2) {
                 const origin = coords[0];
                 const dest = coords[coords.length - 1];
-                console.log('Origin coord:', origin, 'Dest coord:', dest);
+                // console.log('Origin coord:', origin, 'Dest coord:', dest);
 
                 if (originMarker.current) {
                     try {
@@ -390,7 +390,7 @@ const LiveTracking = ({ routeGeoJSON: propRouteGeoJSON, distance, duration }) =>
                 }
 
                 if (distance != null && duration != null && !isNaN(distance) && !isNaN(duration)) {
-                    console.log('Adding route popup with distance:', distance, 'duration:', duration);
+                    // console.log('Adding route popup with distance:', distance, 'duration:', duration);
                     try {
                         const distanceKm = (distance / 1000).toFixed(2);
                         const durationMin = Math.round(duration / 60);
@@ -398,7 +398,7 @@ const LiveTracking = ({ routeGeoJSON: propRouteGeoJSON, distance, duration }) =>
 
                         const midIndex = Math.floor(coords.length / 2);
                         const midPoint = coords[midIndex];
-                        console.log('Popup midpoint:', midPoint);
+                        // console.log('Popup midpoint:', midPoint);
 
                         if (routePopup.current) {
                             try {
@@ -413,7 +413,7 @@ const LiveTracking = ({ routeGeoJSON: propRouteGeoJSON, distance, duration }) =>
                             .setLngLat(midPoint)
                             .setHTML(popupContent)
                             .addTo(map.current);
-                        console.log('Route popup added:', popupContent);
+                        // console.log('Route popup added:', popupContent);
                     } catch (error) {
                         console.error('Failed to add route popup:', error);
                     }
@@ -425,7 +425,7 @@ const LiveTracking = ({ routeGeoJSON: propRouteGeoJSON, distance, duration }) =>
                     try {
                         const bounds = coords.reduce((b, c) => b.extend(c), new maplibregl.LngLatBounds(coords[0], coords[0]));
                         map.current.fitBounds(bounds, { padding: 60 });
-                        console.log('Map bounds fitted to route.');
+                        // console.log('Map bounds fitted to route.');
                         setRouteBoundsSet(true);
                     } catch (error) {
                         console.error('Failed to fit bounds:', error);
@@ -439,12 +439,12 @@ const LiveTracking = ({ routeGeoJSON: propRouteGeoJSON, distance, duration }) =>
         };
 
         if (map.current.isStyleLoaded && map.current.isStyleLoaded()) {
-            console.log('Style already loaded, calling mapIsLoaded immediately.');
+            // console.log('Style already loaded, calling mapIsLoaded immediately.');
             mapIsLoaded();
         } else {
             console.log('Waiting for map load event.');
             map.current.once('load', () => {
-                console.log('Map load event fired.');
+                // console.log('Map load event fired.');
                 mapIsLoaded();
             });
         }
